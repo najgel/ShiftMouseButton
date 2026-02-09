@@ -1,0 +1,28 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+  <PropertyGroup>
+    <OutputName>ShiftMouseButton</OutputName>
+    <WixToolsetVersion>4</WixToolsetVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="4.0.0" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
+  </ItemGroup>
+  <!-- Publish output from main app. Build with: dotnet publish ..\ShiftMouseButton.csproj -c Release -o $(MSBuildProjectDirectory)\publish -->
+  <PropertyGroup>
+    <AppPublishPath>$(MSBuildProjectDirectory)\publish</AppPublishPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>PublishDir=$(AppPublishPath)</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <HarvestDirectory Include="$(AppPublishPath)" Condition="Exists('$(AppPublishPath)')">
+      <ComponentGroupName>HarvestedApp</ComponentGroupName>
+      <DirectoryRefId>InstallDir</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+      <SuppressCom>true</SuppressCom>
+      <SuppressRegistry>true</SuppressRegistry>
+      <PreprocessorVariable>var.PublishDir</PreprocessorVariable>
+    </HarvestDirectory>
+  </ItemGroup>
+</Project>

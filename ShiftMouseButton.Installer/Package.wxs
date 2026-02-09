@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="ShiftMouseButton" Version="1.0.0" Manufacturer="ShiftMouseButton"
+           UpgradeCode="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+    <MediaTemplate />
+
+    <!-- Close app during uninstall so files are not locked and can be removed -->
+    <util:CloseApplication Id="CloseShiftMouseButton" Target="ShiftMouseButton.exe"
+                          CloseMessage="yes" TerminateProcess="1" RebootPrompt="no"
+                          Condition="REMOVE=&quot;ALL&quot;" />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="InstallDir" Name="ShiftMouseButton">
+        <!-- Remove empty install dir on uninstall (files removed after app is closed) -->
+        <Component Id="InstallDirCleanup" Guid="E8B8E9A1-2C3D-4E5F-8A9B-0C1D2E3F4A5B">
+          <RemoveFolder Id="RemoveInstallDir" Directory="InstallDir" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="SOFTWARE\ShiftMouseButton" Name="InstallDirCleanup" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="ShiftMouseButton" Level="1">
+      <ComponentGroupRef Id="HarvestedApp" />
+      <ComponentRef Id="InstallDirCleanup" />
+    </Feature>
+
+    <!-- MIT license shown in license dialog -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+    <!-- Exit dialog: success message and optional checkbox (run at startup + launch now when checked) -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="ShiftMouseButton has been installed successfully. Use Ctrl+Alt+M to swap mouse buttons, or click the tray icon." />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Run ShiftMouseButton at Windows startup and launch now" />
+
+    <!-- Capture install path for the startup registry custom action; ARPINSTALLLOCATION so Uninstall key has InstallLocation (CA fallback) -->
+    <SetProperty Id="INSTALLPATH" Value="[InstallDir]" After="InstallFiles" Sequence="execute" />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[InstallDir]" After="CostFinalize" Sequence="execute" />
+
+    <!-- Custom action: when Finish is clicked and checkbox checked, write HKCU\...\Run\MouseButtonSwitcher (same as app) -->
+    <CustomAction Id="SetStartupRegistry" BinaryRef="SetStartupRegistryScript" VBScriptCall="SetStartupRegistry" Execute="immediate" Impersonate="yes" Return="ignore" />
+    <!-- Custom action: when Finish is clicked and checkbox checked, launch ShiftMouseButton.exe -->
+    <CustomAction Id="LaunchApplication" BinaryRef="SetStartupRegistryScript" VBScriptCall="LaunchApplication" Execute="immediate" Impersonate="yes" Return="ignore" />
+    <!-- Custom action: on uninstall, remove the Run key so Windows does not start the app at logon -->
+    <CustomAction Id="RemoveStartupRegistry" BinaryRef="SetStartupRegistryScript" VBScriptCall="RemoveStartupRegistry" Execute="immediate" Impersonate="yes" Return="ignore" />
+    <Binary Id="SetStartupRegistryScript" SourceFile="SetStartupRegistry.vbs" />
+
+    <InstallExecuteSequence>
+      <Custom Action="RemoveStartupRegistry" After="InstallValidate" Condition="REMOVE=&quot;ALL&quot;" />
+    </InstallExecuteSequence>
+
+    <UI>
+      <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="InstallDir" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetStartupRegistry" Order="1"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication" Order="2"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+    </UI>
+  </Package>
+</Wix>

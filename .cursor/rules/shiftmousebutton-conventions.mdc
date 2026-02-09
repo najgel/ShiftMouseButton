@@ -1,0 +1,29 @@
+---
+description: Repo structure, testing, and release conventions for ShiftMouseButton
+alwaysApply: true
+---
+
+# ShiftMouseButton project conventions
+
+## Repo structure
+
+- **ShiftMouseButton** (root): Main Windows Forms tray app. Entry point and UI live in `Program.cs`; testable logic is in `IStartupService`/`StartupService` and `MouseSwapState`.
+- **ShiftMouseButton.Tests**: xUnit test project. Run with `dotnet test`. Do not add WinForms or tray UI tests here; test only the extracted services and helpers.
+- **ShiftMouseButton.Installer**: WiX v4 MSI project. Build only after publishing the main app into `ShiftMouseButton.Installer/publish`. Do not change the WiX project or harvest paths without updating README and any CI that builds the MSI.
+
+## Testing
+
+- Unit tests live in `ShiftMouseButton.Tests`. Keep business logic testable by using `IStartupService` and static helpers like `MouseSwapState` in the main app.
+- Before committing changes that touch app or test code, run `dotnet test` and ensure all tests pass.
+- Startup tests use a dedicated registry key under `HKCU\SOFTWARE\ShiftMouseButton_Tests`; they do not touch the real Run key.
+
+## Documentation and release
+
+- Keep **README.md** accurate for: build, run, install (MSI and portable), development (tests, MSI build), and license.
+- Version is set in `ShiftMouseButton.csproj` and in `ShiftMouseButton.Installer/Package.wxs`; keep them in sync when cutting a release.
+- CI (`.github/workflows`) builds and tests on push/PR and produces ZIPs + MSI on release. Do not change workflow artifact paths or project paths without updating the workflow and README.
+
+## Installer (WiX)
+
+- MSI is built from `ShiftMouseButton.Installer.wixproj`; it harvests files from `ShiftMouseButton.Installer/publish`. To build locally: publish the main app to that folder, then `dotnet build` the installer project.
+- Do not remove or rename the `HarvestedApp` component group or `InstallDir` in `Package.wxs` without updating the wixproj harvest settings.
