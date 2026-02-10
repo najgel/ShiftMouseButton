@@ -22,31 +22,50 @@ namespace ShiftMouseButton
         public const int SM_SWAPBUTTON = 23;
         public const int WM_HOTKEY = 0x0312;
         public const int HOTKEY_ID = 1;
-        public const uint MOD_CONTROL = 0x0002;
-        public const uint MOD_ALT = 0x0001;
-        public const uint VK_M = 0x4D;
 
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             var startupService = new StartupService(() => Application.ExecutablePath);
-            Application.Run(new MouseButtonSwitcher(startupService));
+
+            ISettingsService settingsService = new JsonSettingsService();
+            Hotkey hotkey = settingsService.LoadHotkey();
+
+            if (HotkeyCli.TryGetHotkeyOverride(args, out var cliHotkey, out var cliError))
+            {
+                hotkey = cliHotkey;
+            }
+            else if (!string.IsNullOrWhiteSpace(cliError))
+            {
+                MessageBox.Show(
+                    cliError,
+                    "Invalid --hotkey Argument",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+
+            Application.Run(new MouseButtonSwitcher(startupService, settingsService, hotkey));
         }
     }
 
     public class MouseButtonSwitcher : Form
     {
         private readonly IStartupService _startupService;
+        private readonly ISettingsService _settingsService;
+        private Hotkey _hotkey;
         private NotifyIcon? notifyIcon;
         private ContextMenuStrip? contextMenu;
         private ToolStripMenuItem? startupMenuItem;
+        private ToolStripMenuItem? swapMenuItem;
         private const int HOTKEY_ID = 1;
 
-        public MouseButtonSwitcher(IStartupService startupService)
+        public MouseButtonSwitcher(IStartupService startupService, ISettingsService settingsService, Hotkey hotkey)
         {
             _startupService = startupService ?? throw new ArgumentNullException(nameof(startupService));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _hotkey = hotkey.IsValid ? hotkey : Hotkey.Default;
             InitializeComponent();
             RegisterHotkey();
             UpdateStartupMenuState();
@@ -62,7 +81,9 @@ namespace ShiftMouseButton
 
             // Create context menu
             contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("Swap Mouse Buttons (Ctrl+Alt+M)", null, OnSwapClick);
+            swapMenuItem = new ToolStripMenuItem(GetSwapMenuText(), null, OnSwapClick);
+            contextMenu.Items.Add(swapMenuItem);
+            contextMenu.Items.Add("Hotkey...", null, OnHotkeyClick);
             contextMenu.Items.Add("-");
             startupMenuItem = new ToolStripMenuItem("Run at Startup", null, OnStartupToggleClick);
             contextMenu.Items.Add(startupMenuItem);
@@ -72,7 +93,7 @@ namespace ShiftMouseButton
             // Create system tray icon
             notifyIcon = new NotifyIcon();
             notifyIcon.Icon = SystemIcons.Application;
-            notifyIcon.Text = "Mouse Button Switcher - Ctrl+Alt+M to swap";
+            notifyIcon.Text = GetTrayTooltipText();
             notifyIcon.ContextMenuStrip = contextMenu;
             notifyIcon.Visible = true;
             notifyIcon.MouseClick += NotifyIcon_MouseClick;
@@ -88,23 +109,19 @@ namespace ShiftMouseButton
 
         private void RegisterHotkey()
         {
-            bool registered = Program.RegisterHotKey(
-                this.Handle,
-                HOTKEY_ID,
-                Program.MOD_CONTROL | Program.MOD_ALT,
-                Program.VK_M
-            );
-
-            if (!registered)
+            if (!TryRegisterHotkey(_hotkey))
             {
                 MessageBox.Show(
-                    "Failed to register hotkey Ctrl+Alt+M. It may already be in use.",
+                    $"Failed to register hotkey {_hotkey}. It may already be in use.",
                     "Hotkey Registration Failed",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );
             }
         }
+
+        private bool TryRegisterHotkey(Hotkey hotkey) =>
+            Program.RegisterHotKey(this.Handle, HOTKEY_ID, (uint)hotkey.Modifiers, hotkey.VirtualKey);
 
         protected override void WndProc(ref Message m)
         {
@@ -118,6 +135,65 @@ namespace ShiftMouseButton
         private void OnSwapClick(object? sender, EventArgs e)
         {
             SwapMouseButtons();
+        }
+
+        private void OnHotkeyClick(object? sender, EventArgs e)
+        {
+            using var dialog = new HotkeyDialog(_hotkey);
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            ApplyHotkey(dialog.SelectedHotkey, persist: true);
+        }
+
+        private void ApplyHotkey(Hotkey newHotkey, bool persist)
+        {
+            if (!newHotkey.IsValid)
+            {
+                MessageBox.Show("Invalid hotkey.", "Hotkey", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            Hotkey oldHotkey = _hotkey;
+
+            // Unregister previous hotkey (best-effort), then try register the new one.
+            Program.UnregisterHotKey(this.Handle, HOTKEY_ID);
+            if (!TryRegisterHotkey(newHotkey))
+            {
+                // Roll back: try to re-register the old hotkey.
+                _ = TryRegisterHotkey(oldHotkey);
+                MessageBox.Show(
+                    $"Failed to register hotkey {newHotkey}. It may already be in use.",
+                    "Hotkey Registration Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            _hotkey = newHotkey;
+            UpdateHotkeyUi();
+
+            if (persist)
+            {
+                try
+                {
+                    _settingsService.SaveHotkey(newHotkey);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Failed to save settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
+            if (notifyIcon != null)
+            {
+                notifyIcon.BalloonTipTitle = "Hotkey Updated";
+                notifyIcon.BalloonTipText = $"New hotkey: {_hotkey}";
+                notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+                notifyIcon.ShowBalloonTip(2000);
+            }
         }
 
         private void OnExitClick(object? sender, EventArgs e)
@@ -201,6 +277,28 @@ namespace ShiftMouseButton
             }
 
             base.OnFormClosing(e);
+        }
+
+        private string GetSwapMenuText() => $"Swap Mouse Buttons ({_hotkey})";
+
+        private string GetTrayTooltipText()
+        {
+            // NotifyIcon.Text has a length limit; keep this short.
+            string text = $"ShiftMouseButton - {_hotkey} to swap";
+            return text.Length <= 63 ? text : text[..63];
+        }
+
+        private void UpdateHotkeyUi()
+        {
+            if (swapMenuItem != null)
+            {
+                swapMenuItem.Text = GetSwapMenuText();
+            }
+
+            if (notifyIcon != null)
+            {
+                notifyIcon.Text = GetTrayTooltipText();
+            }
         }
     }
 }

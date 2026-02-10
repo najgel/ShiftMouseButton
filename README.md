@@ -4,7 +4,7 @@ A small Windows tray utility that lets you swap the primary mouse button (left/r
 
 ## Features
 
-- **Hotkey support**: Press `Ctrl+Alt+M` to swap mouse buttons (global, works from any app)
+- **Hotkey support**: Press `Ctrl+Alt+M` (default) to swap mouse buttons (global, works from any app) — configurable
 - **System tray**: Runs in the background with a tray icon
 - **Notifications**: Balloon tip when buttons are swapped
 - **Context menu**: Right-click the tray icon to swap, toggle startup, or exit
@@ -32,14 +32,19 @@ Or run the executable from `bin/Debug/net8.0-windows/ShiftMouseButton.exe` (or `
 ## Usage
 
 1. **Swap mouse buttons**
-   - Press `Ctrl+Alt+M` (global hotkey)
+   - Press your configured hotkey (default: `Ctrl+Alt+M`)
    - Or left-click the system tray icon
-   - Or right-click the tray icon and choose "Swap Mouse Buttons (Ctrl+Alt+M)"
+   - Or right-click the tray icon and choose "Swap Mouse Buttons (…)"
 
-2. **Run at startup**
+2. **Change hotkey**
+   - Right-click the tray icon → "Hotkey..."
+   - Settings are saved in `%AppData%\ShiftMouseButton\settings.json`
+   - Optional command-line override: `ShiftMouseButton.exe --hotkey "Ctrl+Alt+M"`
+
+3. **Run at startup**
    - Right-click the tray icon → "Run at Startup" (checkmark when enabled)
 
-3. **Exit**
+4. **Exit**
    - Right-click the tray icon → "Exit"
 
 ## How it works

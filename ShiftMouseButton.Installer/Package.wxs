@@ -31,7 +31,7 @@
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
     <!-- Exit dialog: success message and optional checkbox (run at startup + launch now when checked) -->
-    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="ShiftMouseButton has been installed successfully. Use Ctrl+Alt+M to swap mouse buttons, or click the tray icon." />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="ShiftMouseButton has been installed successfully. Use Ctrl+Alt+M (default) to swap mouse buttons, or click the tray icon. You can change the hotkey from the tray menu." />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Run ShiftMouseButton at Windows startup and launch now" />
 
     <!-- Capture install path for the startup registry custom action; ARPINSTALLLOCATION so Uninstall key has InstallLocation (CA fallback) -->
