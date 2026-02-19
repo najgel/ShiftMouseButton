@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.1] - 2026-02-19
+
+### Fixed
+- Release pipeline – asset upload now succeeds (permission fix, modernized upload action)
+
 ## [1.0.0] - 2025-02-10
 
 ### Added

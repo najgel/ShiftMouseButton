@@ -2,7 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
-  <Package Name="ShiftMouseButton" Version="1.0.0" Manufacturer="ShiftMouseButton"
+  <Package Name="ShiftMouseButton" Version="1.0.1" Manufacturer="ShiftMouseButton"
            UpgradeCode="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
     <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
     <MediaTemplate />

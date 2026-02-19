@@ -9,7 +9,7 @@
     <AssemblyTitle>ShiftMouseButton</AssemblyTitle>
     <Product>ShiftMouseButton</Product>
     <Description>Windows tray utility to swap primary mouse button (left/right) via configurable hotkey.</Description>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>ShiftMouseButton</Authors>
     <RepositoryUrl>https://github.com/najgel/ShiftMouseButton</RepositoryUrl>
     <PackageProjectUrl>https://github.com/najgel/ShiftMouseButton</PackageProjectUrl>
