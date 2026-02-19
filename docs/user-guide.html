@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShiftMouseButton – User Guide</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      color: #24292f;
+      background: #fff;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; }
+    h3 { font-size: 1rem; margin-top: 1.5rem; }
+    a { color: #0969da; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul { padding-left: 1.5rem; }
+    code { background: #f6f8fa; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    .back { margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+  <p class="back"><a href="index.html">← Back to home</a></p>
+  <h1>ShiftMouseButton – User Guide</h1>
+
+  <h2>Installation</h2>
+  <h3>MSI (recommended)</h3>
+  <p>Download <code>ShiftMouseButton-x.x.x.msi</code> from the <a href="https://github.com/najgel/ShiftMouseButton/releases">releases page</a>, run the installer, and follow the prompts. You can optionally check "Run ShiftMouseButton at Windows startup and launch now" on the final screen.</p>
+
+  <h3>Portable</h3>
+  <p>Download the ZIP, extract it, and run <code>ShiftMouseButton.exe</code>. If you want it to start with Windows, use the tray menu → "Run at Startup".</p>
+
+  <h2>Usage</h2>
+  <h3>Swap mouse buttons</h3>
+  <ul>
+    <li>Press your configured hotkey (default <code>Ctrl+Alt+M</code>)</li>
+    <li>Or left-click the system tray icon</li>
+    <li>Or right-click the tray icon → "Swap Mouse Buttons (...)"</li>
+  </ul>
+
+  <h3>Change the hotkey</h3>
+  <p>Right-click the tray icon → "Hotkey...". Pick modifiers (Ctrl, Alt, Shift, Win) and a key. Settings are saved in <code>%AppData%\ShiftMouseButton\settings.json</code>.</p>
+  <p>You can also override on the command line: <code>ShiftMouseButton.exe --hotkey "Ctrl+Alt+M"</code> or <code>--hotkey=Ctrl+Alt+N</code>.</p>
+
+  <h3>Run at startup</h3>
+  <p>Right-click the tray icon → "Run at Startup". A checkmark indicates it is enabled.</p>
+
+  <h3>Exit</h3>
+  <p>Right-click the tray icon → "Exit".</p>
+
+  <h2>Requirements</h2>
+  <ul>
+    <li>Windows</li>
+    <li><a href="https://dotnet.microsoft.com/download/dotnet/8.0">.NET 8.0 Desktop Runtime</a> (unless using a build that includes the runtime)</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+  <p>If you see "Failed to register hotkey", another application (or another instance) may be using that hotkey. Choose a different combination or close the other app.</p>
+
+  <p class="back"><a href="index.html">← Back to home</a></p>
+</body>
+</html>

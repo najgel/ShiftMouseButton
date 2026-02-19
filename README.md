@@ -2,6 +2,8 @@
 
 A small Windows tray utility that lets you swap the primary mouse button (left/right) with a hotkey—handy for left-handed use or temporary swap.
 
+**Website:** [najgel.github.io/ShiftMouseButton](https://najgel.github.io/ShiftMouseButton)
+
 ## Features
 
 - **Hotkey support**: Press `Ctrl+Alt+M` (default) to swap mouse buttons (global, works from any app) — configurable
@@ -58,6 +60,7 @@ The app uses the Windows API:
 ## Development
 
 - **Run tests:** `dotnet test`
+- **GitHub Pages:** The `docs/` folder contains the project website. Enable in repo **Settings → Pages → Deploy from a branch** (branch: `master`, folder: `/docs`).
 - **Release build:** `dotnet publish -c Release` (see Build/release below for options)
 - **Build MSI:** Use **Release** so the installed app is not a debug build. From the repo root either:
   - **Recommended:** run the script:

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShiftMouseButton – Mouse Button Switcher</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      color: #24292f;
+      background: #fff;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .tagline { color: #57606a; margin-bottom: 2rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; }
+    a { color: #0969da; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .downloads {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .downloads a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: #0969da;
+      color: #fff !important;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .downloads a:hover {
+      background: #0550ae;
+      text-decoration: none;
+    }
+    ul { padding-left: 1.5rem; }
+    code { background: #f6f8fa; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>ShiftMouseButton</h1>
+  <p class="tagline">A small Windows tray utility to swap the primary mouse button (left/right) with a hotkey.</p>
+
+  <h2>Download</h2>
+  <p>Get the latest release from GitHub:</p>
+  <div class="downloads">
+    <a href="https://github.com/najgel/ShiftMouseButton/releases">View all releases</a>
+  </div>
+  <p>Choose one of:</p>
+  <ul>
+    <li><strong>MSI</strong> – Recommended. Installs to Program Files and adds an uninstaller.</li>
+    <li><strong>Portable ZIP</strong> – Extract and run. Use "Run at Startup" from the tray if desired.</li>
+  </ul>
+  <p>Requires Windows and <a href="https://dotnet.microsoft.com/download/dotnet/8.0">.NET 8.0 Desktop Runtime</a> (if not using a self-contained build).</p>
+
+  <h2>Features</h2>
+  <ul>
+    <li>Global hotkey (default <code>Ctrl+Alt+M</code>) to swap mouse buttons – configurable</li>
+    <li>System tray icon – left-click to swap, right-click for menu</li>
+    <li>Run at Windows startup option</li>
+  </ul>
+
+  <h2>Documentation</h2>
+  <p><a href="user-guide.html">User guide</a> – Installation, usage, and configuration.</p>
+
+  <h2>Source</h2>
+  <p><a href="https://github.com/najgel/ShiftMouseButton">GitHub repository</a> · MIT License</p>
+</body>
+</html>
