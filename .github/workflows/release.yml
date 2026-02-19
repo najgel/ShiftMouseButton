@@ -42,32 +42,18 @@ jobs:
           dotnet publish ShiftMouseButton.csproj -c Release -r win-x64 -o ShiftMouseButton.Installer/publish
           dotnet build ShiftMouseButton.Installer/ShiftMouseButton.Installer.wixproj -c Release
 
-      - name: Upload artifacts
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./ShiftMouseButton-fd-win-x64.zip
-          asset_name: ShiftMouseButton-fd-win-x64.zip
-          asset_content_type: application/zip
+      - name: Prepare versioned MSI name
+        run: |
+          $version = "${{ github.event.release.tag_name }}" -replace '^v', ''
+          Copy-Item "ShiftMouseButton.Installer/bin/Release/ShiftMouseButton.msi" "ShiftMouseButton-$version.msi"
 
-      - name: Upload single-file ZIP
-        uses: actions/upload-release-asset@v1
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            ShiftMouseButton-fd-win-x64.zip
+            ShiftMouseButton-singlefile-win-x64.zip
+            ShiftMouseButton-*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./ShiftMouseButton-singlefile-win-x64.zip
-          asset_name: ShiftMouseButton-singlefile-win-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload MSI
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./ShiftMouseButton.Installer/bin/Release/ShiftMouseButton.msi
-          asset_name: ShiftMouseButton-1.0.0.msi
-          asset_content_type: application/msi
