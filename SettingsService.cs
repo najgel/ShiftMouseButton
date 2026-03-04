@@ -8,6 +8,8 @@ public interface ISettingsService
 {
     Hotkey LoadHotkey();
     void SaveHotkey(Hotkey hotkey);
+    bool? LoadSwapState();
+    void SaveSwapState(bool swapped);
     string SettingsFilePath { get; }
 }
 
@@ -55,13 +57,68 @@ internal sealed class JsonSettingsService : ISettingsService
             throw new ArgumentException("Hotkey is invalid.", nameof(hotkey));
         }
 
+        EnsureSettingsDirectoryExists();
+        var settings = LoadOrCreateSettings();
+        settings.Hotkey = hotkey.ToString();
+        SaveSettings(settings);
+    }
+
+    public bool? LoadSwapState()
+    {
+        try
+        {
+            if (!File.Exists(_settingsFilePath))
+            {
+                return null;
+            }
+
+            string json = File.ReadAllText(_settingsFilePath);
+            var settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+            return settings?.SwapButtons;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public void SaveSwapState(bool swapped)
+    {
+        EnsureSettingsDirectoryExists();
+        var settings = LoadOrCreateSettings();
+        settings.SwapButtons = swapped;
+        SaveSettings(settings);
+    }
+
+    private void EnsureSettingsDirectoryExists()
+    {
         string? dir = Path.GetDirectoryName(_settingsFilePath);
         if (!string.IsNullOrWhiteSpace(dir))
         {
             Directory.CreateDirectory(dir);
         }
+    }
 
-        var settings = new AppSettings { Hotkey = hotkey.ToString() };
+    private AppSettings LoadOrCreateSettings()
+    {
+        if (!File.Exists(_settingsFilePath))
+        {
+            return new AppSettings();
+        }
+
+        try
+        {
+            string json = File.ReadAllText(_settingsFilePath);
+            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+        }
+        catch
+        {
+            return new AppSettings();
+        }
+    }
+
+    private void SaveSettings(AppSettings settings)
+    {
         string json = JsonSerializer.Serialize(settings, JsonOptions);
         File.WriteAllText(_settingsFilePath, json);
     }
@@ -83,6 +140,7 @@ internal sealed class JsonSettingsService : ISettingsService
     private sealed class AppSettings
     {
         public string? Hotkey { get; set; }
+        public bool? SwapButtons { get; set; }
     }
 }
 

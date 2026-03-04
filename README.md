@@ -40,7 +40,7 @@ Or run the executable from `bin/Debug/net8.0-windows/ShiftMouseButton.exe` (or `
 
 2. **Change hotkey**
    - Right-click the tray icon → "Hotkey..."
-   - Settings are saved in `%AppData%\ShiftMouseButton\settings.json`
+   - Settings (hotkey and swap state) are saved in `%AppData%\ShiftMouseButton\settings.json`
    - Optional command-line override: `ShiftMouseButton.exe --hotkey "Ctrl+Alt+M"`
 
 3. **Run at startup**

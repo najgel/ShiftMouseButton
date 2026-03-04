@@ -69,6 +69,7 @@ namespace ShiftMouseButton
             InitializeComponent();
             RegisterHotkey();
             UpdateStartupMenuState();
+            RestoreSwapState();
         }
 
         private void InitializeComponent()
@@ -239,6 +240,20 @@ namespace ShiftMouseButton
             }
         }
 
+        private void RestoreSwapState()
+        {
+            bool? persisted = _settingsService.LoadSwapState();
+            int currentMetric = Program.GetSystemMetrics(Program.SM_SWAPBUTTON);
+
+            if (!MouseSwapState.ShouldRestoreSwap(persisted, currentMetric))
+            {
+                return;
+            }
+
+            bool desiredSwapped = persisted!.Value;
+            Program.SwapMouseButton(desiredSwapped);
+        }
+
         private void SwapMouseButtons()
         {
             int currentMetric = Program.GetSystemMetrics(Program.SM_SWAPBUTTON);
@@ -246,6 +261,16 @@ namespace ShiftMouseButton
 
             // Swap the buttons
             Program.SwapMouseButton(!isSwapped);
+
+            bool newSwapped = !isSwapped;
+            try
+            {
+                _settingsService.SaveSwapState(newSwapped);
+            }
+            catch
+            {
+                // Ignore save failures to avoid disrupting UX
+            }
 
             int newMetric = Program.GetSystemMetrics(Program.SM_SWAPBUTTON);
             string primaryButton = MouseSwapState.GetPrimaryButtonName(newMetric);

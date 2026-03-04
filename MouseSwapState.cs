@@ -21,4 +21,18 @@ public static class MouseSwapState
     {
         return swapButtonMetric != 0;
     }
+
+    /// <summary>
+    /// Returns true if the app should restore the swap state (persisted differs from current).
+    /// </summary>
+    public static bool ShouldRestoreSwap(bool? persistedSwap, int currentSwapMetric)
+    {
+        if (persistedSwap is not bool desired)
+        {
+            return false;
+        }
+
+        bool current = IsSwapped(currentSwapMetric);
+        return current != desired;
+    }
 }

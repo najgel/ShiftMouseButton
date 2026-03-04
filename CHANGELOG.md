@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2] - 2026-03-04
+
+### Fixed
+- **Persist mouse swap state across reboots** – Swap preference is now saved and restored on startup
+
 ## [1.0.1] - 2026-02-19
 
 ### Fixed
